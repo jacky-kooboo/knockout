@@ -9,8 +9,8 @@ ko.utils = (function () {
 
     function extend(target, source) {
         if (source) {
-            for(var prop in source) {
-                if(source.hasOwnProperty(prop)) {
+            for (var prop in source) {
+                if (source.hasOwnProperty(prop)) {
                     target[prop] = source[prop];
                 }
             }
@@ -23,7 +23,7 @@ ko.utils = (function () {
         return obj;
     }
 
-    var canSetPrototype = ({ __proto__: [] } instanceof Array);
+    var canSetPrototype = ({__proto__: []} instanceof Array);
     var canUseSymbols = !DEBUG && typeof Symbol === 'function';
 
     // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
@@ -31,28 +31,29 @@ ko.utils = (function () {
     var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
     knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
     knownEvents['MouseEvents'] = ['click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave'];
-    objectForEach(knownEvents, function(eventType, knownEventsForType) {
+    objectForEach(knownEvents, function (eventType, knownEventsForType) {
         if (knownEventsForType.length) {
             for (var i = 0, j = knownEventsForType.length; i < j; i++)
                 knownEventTypesByEventName[knownEventsForType[i]] = eventType;
         }
     });
-    var eventsThatMustBeRegisteredUsingAttachEvent = { 'propertychange': true }; // Workaround for an IE9 issue - https://github.com/SteveSanderson/knockout/issues/406
+    var eventsThatMustBeRegisteredUsingAttachEvent = {'propertychange': true}; // Workaround for an IE9 issue - https://github.com/SteveSanderson/knockout/issues/406
 
     // Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
     // Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
     // Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
     // If there is a future need to detect specific versions of IE10+, we will amend this.
-    var ieVersion = document && (function() {
-        var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
+    var ieVersion = document && (function () {
+            var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 
-        // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
-        while (
-            div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
-            iElems[0]
-        ) {}
-        return version > 4 ? version : undefined;
-    }());
+            // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
+            while (
+                div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
+                    iElems[0]
+                ) {
+            }
+            return version > 4 ? version : undefined;
+        }());
     var isIe6 = ieVersion === 6,
         isIe7 = ieVersion === 7;
 
@@ -72,7 +73,7 @@ ko.utils = (function () {
         if (classNames) {
             if (typeof node.classList === 'object') {
                 addOrRemoveFn = node.classList[shouldHaveClass ? 'add' : 'remove'];
-                ko.utils.arrayForEach(classNames.match(cssClassNameRegex), function(className) {
+                ko.utils.arrayForEach(classNames.match(cssClassNameRegex), function (className) {
                     addOrRemoveFn.call(node.classList, className);
                 });
             } else if (typeof node.className['baseVal'] === 'string') {
@@ -88,7 +89,7 @@ ko.utils = (function () {
     function toggleObjectClassPropertyString(obj, prop, classNames, shouldHaveClass) {
         // obj/prop is either a node/'className' or a SVGAnimatedString/'baseVal'.
         var currentClassNames = obj[prop].match(cssClassNameRegex) || [];
-        ko.utils.arrayForEach(classNames.match(cssClassNameRegex), function(className) {
+        ko.utils.arrayForEach(classNames.match(cssClassNameRegex), function (className) {
             ko.utils.addOrRemoveItem(currentClassNames, className, shouldHaveClass);
         });
         obj[prop] = currentClassNames.join(" ");
@@ -164,7 +165,7 @@ ko.utils = (function () {
             return array;
         },
 
-        addOrRemoveItem: function(array, value, included) {
+        addOrRemoveItem: function (array, value, included) {
             var existingEntryIndex = ko.utils.arrayIndexOf(ko.utils.peekObservable(array), value);
             if (existingEntryIndex < 0) {
                 if (included)
@@ -185,7 +186,7 @@ ko.utils = (function () {
 
         objectForEach: objectForEach,
 
-        objectMap: function(source, mapping) {
+        objectMap: function (source, mapping) {
             if (!source)
                 return source;
             var target = {};
@@ -203,7 +204,7 @@ ko.utils = (function () {
             }
         },
 
-        moveCleanedNodesToContainerElement: function(nodes) {
+        moveCleanedNodesToContainerElement: function (nodes) {
             // Ensure it's a real array, as we're about to reparent the nodes and
             // we don't want the underlying collection to change while we're doing that.
             var nodesArray = ko.utils.makeArray(nodes);
@@ -245,7 +246,7 @@ ko.utils = (function () {
             }
         },
 
-        fixUpContinuousNodeArray: function(continuousNodeArray, parentNode) {
+        fixUpContinuousNodeArray: function (continuousNodeArray, parentNode) {
             // Before acting on a set of nodes that were previously outputted by a template function, we have to reconcile
             // them against what is in the DOM right now. It may be that some of the nodes have already been removed, or that
             // new nodes might have been inserted in the middle, for example by a binding. Also, there may previously have been
@@ -330,11 +331,11 @@ ko.utils = (function () {
             return ko.utils.domNodeIsContainedBy(node, node.ownerDocument.documentElement);
         },
 
-        anyDomNodeIsAttachedToDocument: function(nodes) {
+        anyDomNodeIsAttachedToDocument: function (nodes) {
             return !!ko.utils.arrayFirst(nodes, ko.utils.domNodeIsAttachedToDocument);
         },
 
-        tagNameLower: function(element) {
+        tagNameLower: function (element) {
             // For HTML elements, tagName will always be upper case; for XHTML elements, it'll be lower case.
             // Possible future optimization: If we know it's an element from an XHTML document (not HTML),
             // we don't need to do the .toLowerCase() as it will always be lower case anyway.
@@ -369,16 +370,22 @@ ko.utils = (function () {
             var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType];
             if (!ko.options['useOnlyNativeEvents'] && !mustUseAttachEvent && jQueryInstance) {
                 jQueryInstance(element)['bind'](eventType, wrappedHandler);
-            } else if (!mustUseAttachEvent && typeof element.addEventListener == "function")
+            } else if (!mustUseAttachEvent && typeof element.addEventListener == "function") {
                 element.addEventListener(eventType, wrappedHandler, false);
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    element.removeEventListener(eventType, wrappedHandler);
+                });
+            }
             else if (typeof element.attachEvent != "undefined") {
-                var attachEventHandler = function (event) { wrappedHandler.call(element, event); },
+                var attachEventHandler = function (event) {
+                        wrappedHandler.call(element, event);
+                    },
                     attachEventName = "on" + eventType;
                 element.attachEvent(attachEventName, attachEventHandler);
 
                 // IE does not dispose attachEvent handlers automatically (unlike with addEventListener)
                 // so to avoid leaks, we have to remove them manually. See bug #856
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                     element.detachEvent(attachEventName, attachEventHandler);
                 });
             } else
@@ -425,7 +432,7 @@ ko.utils = (function () {
 
         toggleDomNodeCssClass: toggleDomNodeCssClass,
 
-        setTextContent: function(element, textContent) {
+        setTextContent: function (element, textContent) {
             var value = ko.utils.unwrapObservable(textContent);
             if ((value === null) || (value === undefined))
                 value = "";
@@ -443,7 +450,7 @@ ko.utils = (function () {
             ko.utils.forceRefresh(element);
         },
 
-        setElementName: function(element, name) {
+        setElementName: function (element, name) {
             element.name = name;
 
             // Workaround IE 6/7 issue
@@ -453,11 +460,12 @@ ko.utils = (function () {
                 try {
                     element.mergeAttributes(document.createElement("<input name='" + element.name + "'/>"), false);
                 }
-                catch(e) {} // For IE9 with doc mode "IE9 Standards" and browser mode "IE9 Compatibility View"
+                catch (e) {
+                } // For IE9 with doc mode "IE9 Standards" and browser mode "IE9 Compatibility View"
             }
         },
 
-        forceRefresh: function(node) {
+        forceRefresh: function (node) {
             // Workaround for an IE9 rendering bug - https://github.com/SteveSanderson/knockout/issues/209
             if (ieVersion >= 9) {
                 // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
@@ -467,7 +475,7 @@ ko.utils = (function () {
             }
         },
 
-        ensureSelectElementIsRenderedCorrectly: function(selectElement) {
+        ensureSelectElementIsRenderedCorrectly: function (selectElement) {
             // Workaround for IE9 rendering bug - it doesn't reliably display all the text in dynamically-added select boxes unless you force it to re-render by updating the width.
             // (See https://github.com/SteveSanderson/knockout/issues/312, http://stackoverflow.com/questions/5908494/select-only-shows-first-char-of-selected-option)
             // Also fixes IE7 and IE8 bug that causes selects to be zero width if enclosed by 'if' or 'with'. (See issue #839)
@@ -487,32 +495,38 @@ ko.utils = (function () {
             return result;
         },
 
-        makeArray: function(arrayLikeObject) {
+        makeArray: function (arrayLikeObject) {
             var result = [];
             for (var i = 0, j = arrayLikeObject.length; i < j; i++) {
                 result.push(arrayLikeObject[i]);
-            };
+            }
+            ;
             return result;
         },
 
-        createSymbolOrString: function(identifier) {
+        createSymbolOrString: function (identifier) {
             return canUseSymbols ? Symbol(identifier) : identifier;
         },
 
-        isIe6 : isIe6,
-        isIe7 : isIe7,
-        ieVersion : ieVersion,
+        isIe6: isIe6,
+        isIe7: isIe7,
+        ieVersion: ieVersion,
 
-        getFormFields: function(form, fieldName) {
+        getFormFields: function (form, fieldName) {
             var fields = ko.utils.makeArray(form.getElementsByTagName("input")).concat(ko.utils.makeArray(form.getElementsByTagName("textarea")));
             var isMatchingField = (typeof fieldName == 'string')
-                ? function(field) { return field.name === fieldName }
-                : function(field) { return fieldName.test(field.name) }; // Treat fieldName as regex or object containing predicate
+                ? function (field) {
+                return field.name === fieldName
+            }
+                : function (field) {
+                return fieldName.test(field.name)
+            }; // Treat fieldName as regex or object containing predicate
             var matches = [];
             for (var i = fields.length - 1; i >= 0; i--) {
                 if (isMatchingField(fields[i]))
                     matches.push(fields[i]);
-            };
+            }
+            ;
             return matches;
         },
 
@@ -541,7 +555,7 @@ ko.utils = (function () {
             var url = urlOrForm;
 
             // If we were given a form, use its 'action' URL and pick out any requested field values
-            if((typeof urlOrForm == 'object') && (ko.utils.tagNameLower(urlOrForm) === "form")) {
+            if ((typeof urlOrForm == 'object') && (ko.utils.tagNameLower(urlOrForm) === "form")) {
                 var originalForm = urlOrForm;
                 url = originalForm.action;
                 for (var i = includeFields.length - 1; i >= 0; i--) {
@@ -564,7 +578,7 @@ ko.utils = (function () {
                 input.value = ko.utils.stringifyJson(ko.utils.unwrapObservable(data[key]));
                 form.appendChild(input);
             }
-            objectForEach(params, function(key, value) {
+            objectForEach(params, function (key, value) {
                 var input = document.createElement("input");
                 input.type = "hidden";
                 input.name = key;
@@ -573,7 +587,9 @@ ko.utils = (function () {
             });
             document.body.appendChild(form);
             options['submitter'] ? options['submitter'](form) : form.submit();
-            setTimeout(function () { form.parentNode.removeChild(form); }, 0);
+            setTimeout(function () {
+                form.parentNode.removeChild(form);
+            }, 0);
         }
     }
 }());
